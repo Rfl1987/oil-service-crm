@@ -18,35 +18,35 @@ header {
   display:flex; justify-content:space-between; align-items:center;
   position:sticky; top:0; z-index:50;
 }
-header .logo { font-weight:700; font-size:18px; }
+.logo {
+  background:none; border:none; color:#fff;
+  font-weight:700; font-size:18px; cursor:pointer; padding:0;
+  text-align:left;
+}
 .head-icons { display:flex; gap:8px; }
 .icon-btn {
-  width:40px; height:40px; border-radius:50%;
+  width:36px; height:36px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   border:none; background:rgba(255,255,255,.15); cursor:pointer;
 }
 .icon-btn.wa { background:var(--wa); }
 
-.menu {
-  position:fixed; top:60px; right:12px; background:#fff;
-  border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.18);
-  padding:8px; z-index:60; min-width:190px;
-}
-.menu button {
-  display:block; width:100%; text-align:left; padding:12px;
-  border:none; background:none; font-size:15px; border-radius:8px; cursor:pointer;
-}
-.menu button:active { background:#f1f5f9; }
-
 .hero { background:var(--blue); color:#fff; padding:28px 16px 36px; text-align:center; }
 .hero h1 { margin:0 0 8px; font-size:26px; }
 .hero p { margin:0 0 18px; color:#dbeafe; font-size:15px; }
+.hero .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
 .btn { border:none; border-radius:12px; padding:14px 18px; font-size:15px; font-weight:600; cursor:pointer; }
 .btn-white { background:#fff; color:var(--blue); }
+.btn-outline { background:transparent; color:#fff; border:2px solid #fff; }
 .btn-green { background:var(--green); color:#fff; }
 .btn-blue { background:var(--blue); color:#fff; }
 .btn-wa { background:var(--wa); color:#fff; }
+
+.back-link {
+  background:none; border:none; color:var(--blue);
+  font-size:14px; cursor:pointer; padding:0; margin:0 0 12px;
+}
 
 section { padding:20px 16px; max-width:720px; margin:0 auto; }
 h2 { font-size:20px; margin:0 0 12px; }
@@ -90,23 +90,13 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 <body>
 
 <header>
-  <div class="logo">Oil Service Mərkəzi</div>
+  <button class="logo" onclick="showPage('home')">Oil Service Mərkəzi</button>
   <div class="head-icons">
     <a class="icon-btn wa" href="https://wa.me/994708767849" target="_blank" aria-label="WhatsApp">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
-    <button id="burgerBtn" class="icon-btn" onclick="toggleMenu()" aria-label="Menyu">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
   </div>
 </header>
-
-<div id="menuPanel" class="menu hidden">
-  <button onclick="showPage('home')">Ana səhifə</button>
-  <button onclick="showPage('services')">Xidmətlər</button>
-  <button onclick="showPage('about')">Haqqımızda</button>
-  <button onclick="showPage('contact')">Əlaqə</button>
-</div>
 
 <!-- ================= ANA SƏHİFƏ ================= -->
 <div id="page-home" class="page">
@@ -114,7 +104,10 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
   <div class="hero">
     <h1>Yağ dəyişimi 30 dəqiqəyə</h1>
     <p>Onlayn növbə götürün — sizə WhatsApp ilə təsdiq göndərək.</p>
-    <button class="btn btn-white" onclick="goBooking()">Növbə götür</button>
+    <div class="btns">
+      <button class="btn btn-white" onclick="goBooking()">Növbə götür</button>
+      <button class="btn btn-outline" onclick="showPage('services')">Xidmətlər</button>
+    </div>
   </div>
 
   <section>
@@ -246,6 +239,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 <!-- ================= XİDMƏTLƏR ================= -->
 <div id="page-services" class="page hidden">
   <section>
+    <button class="back-link" onclick="showPage('home')">← Geri</button>
     <h2>Xidmətlər</h2>
 
     <div class="srow"><span>Yağ dəyişimi</span><strong>15 AZN</strong></div>
@@ -268,6 +262,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 <!-- ================= HAQQIMIZDA ================= -->
 <div id="page-about" class="page hidden">
   <section>
+    <button class="back-link" onclick="showPage('home')">← Geri</button>
     <h2>Haqqımızda</h2>
 
     <div class="stats-row">
@@ -287,6 +282,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 <!-- ================= ƏLAQƏ ================= -->
 <div id="page-contact" class="page hidden">
   <section>
+    <button class="back-link" onclick="showPage('home')">← Geri</button>
     <h2>Əlaqə</h2>
 
     <div class="contact">
@@ -334,26 +330,8 @@ function showPage(name) {
   const el = document.getElementById("page-" + name);
   if (el) el.classList.remove("hidden");
 
-  closeMenu();
   window.scrollTo({ top: 0 });
 }
-
-function toggleMenu() {
-  document.getElementById("menuPanel").classList.toggle("hidden");
-}
-
-function closeMenu() {
-  document.getElementById("menuPanel").classList.add("hidden");
-}
-
-document.addEventListener("click", function (e) {
-  const menu = document.getElementById("menuPanel");
-  const burger = document.getElementById("burgerBtn");
-
-  if (!menu.classList.contains("hidden") && !menu.contains(e.target) && !burger.contains(e.target)) {
-    closeMenu();
-  }
-});
 
 function goBooking() {
   showPage("home");
