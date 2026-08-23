@@ -5,83 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Oil Service Mərkəzi</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root { --blue:#1d4ed8; --green:#16a34a; --wa:#25D366; }
+:root {
+  --dark:#0b1220;
+  --amber:#f59e0b;
+  --amber-dark:#d97706;
+  --amber-deep:#b45309;
+  --wa:#25D366;
+  --text:#111827;
+  --muted:#64748b;
+}
 * { box-sizing:border-box; }
-body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
+body {
+  margin:0;
+  font-family:"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background:#f6f7f9; color:var(--text);
+}
 .hidden { display:none; }
 
 header {
-  background:var(--blue); color:#fff; padding:12px 16px;
+  background:var(--dark); color:#fff; padding:12px 16px;
   display:flex; justify-content:space-between; align-items:center;
   position:sticky; top:0; z-index:50;
 }
 .logo {
   background:none; border:none; color:#fff;
-  font-weight:700; font-size:18px; cursor:pointer; padding:0;
-  text-align:left;
+  font-weight:800; font-size:18px; cursor:pointer; padding:0;
+  text-align:left; font-family:inherit;
 }
 .head-icons { display:flex; gap:8px; }
 .icon-btn {
   width:36px; height:36px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  border:none; background:rgba(255,255,255,.15); cursor:pointer;
+  border:none; background:rgba(255,255,255,.12); cursor:pointer;
 }
-.icon-btn.wa { background:var(--wa); }
+.icon-btn.wa { background:var(--wa); box-shadow:0 4px 14px rgba(37,211,102,.4); }
 
-.hero { background:var(--blue); color:#fff; padding:28px 16px 36px; text-align:center; }
-.hero h1 { margin:0 0 8px; font-size:26px; }
-.hero p { margin:0 0 18px; color:#dbeafe; font-size:15px; }
+.hero {
+  background:
+    linear-gradient(rgba(8,12,24,.55), rgba(8,12,24,.9)),
+    url("hero.jpg") center/cover no-repeat;
+  color:#fff; padding:56px 16px 64px; text-align:center;
+}
+.hero h1 { margin:0 0 10px; font-size:28px; font-weight:800; }
+.hero p { margin:0 0 20px; color:#e2e8f0; font-size:15px; }
 .hero .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
-.btn { border:none; border-radius:12px; padding:14px 18px; font-size:15px; font-weight:600; cursor:pointer; }
-.btn-white { background:#fff; color:var(--blue); }
-.btn-outline { background:transparent; color:#fff; border:2px solid #fff; }
-.btn-green { background:var(--green); color:#fff; }
-.btn-blue { background:var(--blue); color:#fff; }
-.btn-wa { background:var(--wa); color:#fff; }
+.chips { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+.chips span {
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(6px); padding:6px 12px; border-radius:999px; font-size:12px;
+}
+
+.btn {
+  border:none; border-radius:999px; padding:14px 22px;
+  font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn:active { transform:scale(.97); }
+.btn-amber {
+  background:linear-gradient(135deg, var(--amber), var(--amber-dark));
+  color:var(--dark);
+  box-shadow:0 8px 20px rgba(245,158,11,.35);
+}
+.btn-glass {
+  background:rgba(255,255,255,.1); color:#fff;
+  border:1.5px solid rgba(255,255,255,.6);
+  backdrop-filter:blur(6px);
+}
+.btn-wa { background:var(--wa); color:#fff; box-shadow:0 8px 20px rgba(37,211,102,.3); }
 
 .back-link {
-  background:none; border:none; color:var(--blue);
-  font-size:14px; cursor:pointer; padding:0; margin:0 0 12px;
+  background:none; border:none; color:var(--amber-deep);
+  font-size:14px; font-weight:700; cursor:pointer; padding:0; margin:0 0 12px;
+  font-family:inherit;
 }
 
 section { padding:20px 16px; max-width:720px; margin:0 auto; }
-h2 { font-size:20px; margin:0 0 12px; }
+h2 { font-size:20px; margin:0 0 14px; font-weight:800; }
+h2::after {
+  content:""; display:block; width:42px; height:4px;
+  border-radius:2px; background:var(--amber); margin-top:6px;
+}
 
 .cards { display:grid; grid-template-columns:1fr; gap:12px; }
 @media (min-width:640px) { .cards { grid-template-columns:repeat(3,1fr); } }
 
-.pcard { background:#fff; border-radius:14px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.08); border-top:4px solid var(--blue); }
-.pcard.popular { border-top-color:var(--green); }
-.pcard h3 { margin:0 0 6px; font-size:17px; }
-.pcard .price { font-size:20px; font-weight:800; margin:6px 0; }
+.pcard {
+  background:#fff; border-radius:18px; padding:16px;
+  box-shadow:0 10px 30px rgba(2,6,23,.08);
+  border-top:4px solid var(--amber);
+}
+.pcard.popular { border-top-color:var(--amber-deep); }
+.badge {
+  display:inline-block; background:#fff7ed; color:var(--amber-deep);
+  font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px; margin-bottom:6px;
+}
+.pcard h3 { margin:0 0 6px; font-size:17px; font-weight:800; }
+.pcard .price { font-size:20px; font-weight:800; margin:6px 0; color:var(--amber-deep); }
 .pcard ul { margin:0; padding-left:18px; font-size:14px; color:#374151; }
 
-.formcard { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.formcard { background:#fff; border-radius:18px; padding:18px; box-shadow:0 10px 30px rgba(2,6,23,.08); }
 .field { margin-bottom:12px; }
-.field label { display:block; font-size:13px; color:#374151; margin-bottom:4px; }
-.field input, .field select { width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; font-size:15px; }
+.field label { display:block; font-size:13px; color:#374151; margin-bottom:4px; font-weight:700; }
+.field input, .field select {
+  width:100%; padding:12px; border:1px solid #d1d5db;
+  border-radius:12px; font-size:15px; font-family:inherit;
+}
+.field input:focus, .field select:focus {
+  outline:none; border-color:var(--amber);
+  box-shadow:0 0 0 3px rgba(245,158,11,.15);
+}
 .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-.contact { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); font-size:15px; }
+.contact { background:#fff; border-radius:18px; padding:18px; box-shadow:0 10px 30px rgba(2,6,23,.08); font-size:15px; }
 .contact .rowline { display:flex; justify-content:space-between; gap:8px; padding:10px 0; border-bottom:1px solid #f1f5f9; }
 
-.srow { display:flex; justify-content:space-between; gap:8px; background:#fff; border-radius:10px; padding:12px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.06); font-size:15px; }
+.srow {
+  display:flex; justify-content:space-between; gap:8px;
+  background:#fff; border-radius:12px; padding:12px; margin-bottom:8px;
+  box-shadow:0 4px 14px rgba(2,6,23,.06); font-size:15px;
+}
 
-.about-card { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); font-size:15px; line-height:1.6; color:#374151; }
+.about-card {
+  background:#fff; border-radius:18px; padding:18px;
+  box-shadow:0 10px 30px rgba(2,6,23,.08);
+  font-size:15px; line-height:1.7; color:#374151;
+}
 .about-card p { margin:0 0 12px; }
 
 .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
-.stat { background:#eff6ff; border-radius:12px; padding:12px; text-align:center; }
-.stat .n { font-size:20px; font-weight:800; color:var(--blue); }
+.stat { background:#fff7ed; border-radius:14px; padding:12px; text-align:center; }
+.stat .n { font-size:20px; font-weight:800; color:var(--amber-deep); }
 .stat .t { font-size:12px; color:#374151; }
 
-footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
+footer { padding:20px; text-align:center; font-size:13px; color:var(--muted); }
 .foot-links { display:flex; justify-content:center; gap:14px; margin-bottom:8px; flex-wrap:wrap; }
-.foot-links button { border:none; background:none; color:var(--blue); font-size:13px; cursor:pointer; padding:0; }
+.foot-links button {
+  border:none; background:none; color:var(--amber-deep);
+  font-size:13px; font-weight:700; cursor:pointer; padding:0; font-family:inherit;
+}
 
 .success { background:#ecfdf5; border:1px solid #a7f3d0; border-radius:14px; padding:20px; text-align:center; }
 .success h3 { margin:0 0 6px; color:#047857; }
@@ -93,7 +160,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
   <button class="logo" onclick="showPage('home')">Oil Service Mərkəzi</button>
   <div class="head-icons">
     <a class="icon-btn wa" href="https://wa.me/994708767849" target="_blank" aria-label="WhatsApp">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </a>
   </div>
 </header>
@@ -102,11 +169,16 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 <div id="page-home" class="page">
 
   <div class="hero">
+    <div class="chips">
+      <span>⚡ 30 dəqiqə</span>
+      <span>✅ Zəmanət</span>
+      <span>🛢️ Keyfiyyətli yağ</span>
+    </div>
     <h1>Yağ dəyişimi 30 dəqiqəyə</h1>
     <p>Onlayn növbə götürün — sizə WhatsApp ilə təsdiq göndərək.</p>
     <div class="btns">
-      <button class="btn btn-white" onclick="goBooking()">Növbə götür</button>
-      <button class="btn btn-outline" onclick="showPage('services')">Xidmətlər</button>
+      <button class="btn btn-amber" onclick="goBooking()">Növbə götür</button>
+      <button class="btn btn-glass" onclick="showPage('services')">Xidmətlər</button>
     </div>
   </div>
 
@@ -124,6 +196,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
       </div>
 
       <div class="pcard popular">
+        <div class="badge">Ən çox seçilən</div>
         <h3>Standart</h3>
         <div class="price">95 AZN-dən</div>
         <ul>
@@ -191,7 +264,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 
         <div class="field"><label>Qeyd</label><input id="f_note" placeholder="Əlavə qeydiniz" /></div>
 
-        <button class="btn btn-blue" style="width:100%" type="submit">Növbə götür</button>
+        <button class="btn btn-amber" style="width:100%" type="submit">Növbə götür</button>
       </form>
     </div>
 
@@ -212,7 +285,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 
     <div class="about-card">
       <p>Oil Service Mərkəzi 2018-ci ildən bəri Bakıda avtomobillərə yağ dəyişimi və filtr xidmətləri göstərir. Yalnız keyfiyyətli yağlar istifadə edirik və hər müştərinin km tarixçəsini saxlayırıq.</p>
-      <button class="btn btn-blue" onclick="showPage('about')">Ətraflı oxu</button>
+      <button class="btn btn-amber" onclick="showPage('about')">Ətraflı oxu</button>
     </div>
   </section>
 
@@ -228,7 +301,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
     <iframe
       title="Xəritə"
       src="https://www.google.com/maps?q=N%C9%99simi%20rayonu%2C%20Bak%C4%B1&output=embed"
-      style="width:100%;height:260px;border:0;border-radius:12px;margin-top:12px"
+      style="width:100%;height:260px;border:0;border-radius:14px;margin-top:12px"
       loading="lazy"></iframe>
 
     <button class="btn btn-wa" style="width:100%;margin-top:12px" onclick="window.open('https://wa.me/994708767849','_blank')">WhatsApp ilə yazın</button>
@@ -255,7 +328,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 
     <p class="success" style="margin-top:12px">Qiymətlər təxminidir, avtomobilin modelinə görə dəyişə bilər.</p>
 
-    <button class="btn btn-blue" style="width:100%;margin-top:12px" onclick="goBooking()">Növbə götür</button>
+    <button class="btn btn-amber" style="width:100%;margin-top:12px" onclick="goBooking()">Növbə götür</button>
   </section>
 </div>
 
@@ -294,7 +367,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
     <iframe
       title="Xəritə"
       src="https://www.google.com/maps?q=N%C9%99simi%20rayonu%2C%20Bak%C4%B1&output=embed"
-      style="width:100%;height:260px;border:0;border-radius:12px;margin-top:12px"
+      style="width:100%;height:260px;border:0;border-radius:14px;margin-top:12px"
       loading="lazy"></iframe>
 
     <button class="btn btn-wa" style="width:100%;margin-top:12px" onclick="window.open('https://wa.me/994708767849','_blank')">WhatsApp ilə yazın</button>
