@@ -8,24 +8,45 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root { --blue:#1d4ed8; --green:#16a34a; }
+:root { --blue:#1d4ed8; --green:#16a34a; --wa:#25D366; }
 * { box-sizing:border-box; }
 body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
 .hidden { display:none; }
 
-header { background:var(--blue); color:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; }
+header {
+  background:var(--blue); color:#fff; padding:12px 16px;
+  display:flex; justify-content:space-between; align-items:center;
+  position:sticky; top:0; z-index:50;
+}
 header .logo { font-weight:700; font-size:18px; }
-header a { color:#fff; text-decoration:none; background:rgba(255,255,255,.15); padding:8px 12px; border-radius:10px; font-size:14px; }
+.head-icons { display:flex; gap:8px; }
+.icon-btn {
+  width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:none; background:rgba(255,255,255,.15); cursor:pointer;
+}
+.icon-btn.wa { background:var(--wa); }
+
+.menu {
+  position:fixed; top:60px; right:12px; background:#fff;
+  border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.18);
+  padding:8px; z-index:60; min-width:190px;
+}
+.menu button {
+  display:block; width:100%; text-align:left; padding:12px;
+  border:none; background:none; font-size:15px; border-radius:8px; cursor:pointer;
+}
+.menu button:active { background:#f1f5f9; }
 
 .hero { background:var(--blue); color:#fff; padding:28px 16px 36px; text-align:center; }
 .hero h1 { margin:0 0 8px; font-size:26px; }
 .hero p { margin:0 0 18px; color:#dbeafe; font-size:15px; }
-.hero .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
 .btn { border:none; border-radius:12px; padding:14px 18px; font-size:15px; font-weight:600; cursor:pointer; }
 .btn-white { background:#fff; color:var(--blue); }
 .btn-green { background:var(--green); color:#fff; }
 .btn-blue { background:var(--blue); color:#fff; }
+.btn-wa { background:var(--wa); color:#fff; }
 
 section { padding:20px 16px; max-width:720px; margin:0 auto; }
 h2 { font-size:20px; margin:0 0 12px; }
@@ -46,7 +67,16 @@ h2 { font-size:20px; margin:0 0 12px; }
 .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 .contact { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); font-size:15px; }
-.contact .rowline { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; }
+.contact .rowline { display:flex; justify-content:space-between; gap:8px; padding:10px 0; border-bottom:1px solid #f1f5f9; }
+
+.srow { display:flex; justify-content:space-between; gap:8px; background:#fff; border-radius:10px; padding:12px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.06); font-size:15px; }
+
+.about-card { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); font-size:15px; line-height:1.6; color:#374151; }
+.about-card p { margin:0 0 12px; }
+.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.stat { background:#eff6ff; border-radius:12px; padding:12px; text-align:center; }
+.stat .n { font-size:20px; font-weight:800; color:var(--blue); }
+.stat .t { font-size:12px; color:#374151; }
 
 footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 
@@ -58,117 +88,186 @@ footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
 
 <header>
   <div class="logo">Oil Service Mərkəzi</div>
-  <a href="https://wa.me/994708767849" target="_blank">WhatsApp</a>
+  <div class="head-icons">
+    <a class="icon-btn wa" href="https://wa.me/994708767849" target="_blank" aria-label="WhatsApp">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </a>
+    <button id="burgerBtn" class="icon-btn" onclick="toggleMenu()" aria-label="Menyu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
 </header>
 
-<div class="hero">
-  <h1>Yağ dəyişimi 30 dəqiqəyə</h1>
-  <p>Onlayn növbə götürün — sizə WhatsApp ilə təsdiq göndərək.</p>
-  <div class="btns">
-    <button class="btn btn-white" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})">Növbə götür</button>
-    <button class="btn btn-green" onclick="window.open('https://wa.me/994708767849','_blank')">WhatsApp</button>
-  </div>
+<div id="menuPanel" class="menu hidden">
+  <button onclick="showPage('home')">Ana səhifə</button>
+  <button onclick="showPage('services')">Xidmətlər</button>
+  <button onclick="showPage('about')">Haqqımızda</button>
+  <button onclick="showPage('contact')">Əlaqə</button>
 </div>
 
-<section>
-  <h2>Paketlər</h2>
-  <div class="cards">
-    <div class="pcard">
-      <h3>Ekonom</h3>
-      <div class="price">70 AZN-dən</div>
-      <ul>
-        <li>Yağ dəyişimi</li>
-        <li>Yağ filtri</li>
-        <li>İşçilik</li>
-      </ul>
-    </div>
+<!-- ================= ANA SƏHİFƏ ================= -->
+<div id="page-home" class="page">
 
-    <div class="pcard popular">
-      <h3>Standart</h3>
-      <div class="price">95 AZN-dən</div>
-      <ul>
-        <li>Yağ dəyişimi</li>
-        <li>Yağ filtri</li>
-        <li>Hava filtri</li>
-        <li>İşçilik</li>
-      </ul>
-    </div>
-
-    <div class="pcard">
-      <h3>Full</h3>
-      <div class="price">120 AZN-dən</div>
-      <ul>
-        <li>Yağ + yağ filtri</li>
-        <li>Hava filtri</li>
-        <li>Salon filtri</li>
-        <li>İşçilik</li>
-      </ul>
-    </div>
+  <div class="hero">
+    <h1>Yağ dəyişimi 30 dəqiqəyə</h1>
+    <p>Onlayn növbə götürün — sizə WhatsApp ilə təsdiq göndərək.</p>
+    <button class="btn btn-white" onclick="goBooking()">Növbə götür</button>
   </div>
-</section>
 
-<section id="form">
-  <h2>Onlayn növbə</h2>
-
-  <div id="formWrap" class="formcard">
-    <form onsubmit="submitRequest(event)">
-      <div class="field"><label>Ad Soyad *</label><input id="f_name" /></div>
-      <div class="field"><label>Telefon *</label><input id="f_phone" type="tel" placeholder="0XX XXX XX XX" /></div>
-
-      <div class="grid2">
-        <div class="field"><label>Marka</label><input id="f_brand" placeholder="Toyota" /></div>
-        <div class="field"><label>Model</label><input id="f_model" placeholder="Corolla" /></div>
+  <section>
+    <h2>Paketlər</h2>
+    <div class="cards">
+      <div class="pcard">
+        <h3>Ekonom</h3>
+        <div class="price">70 AZN-dən</div>
+        <ul>
+          <li>Yağ dəyişimi</li>
+          <li>Yağ filtri</li>
+          <li>İşçilik</li>
+        </ul>
       </div>
 
-      <div class="grid2">
-        <div class="field"><label>İl</label><input id="f_year" type="number" placeholder="2019" /></div>
-        <div class="field"><label>Dövlət nömrəsi</label><input id="f_plate" placeholder="90-YY-456" /></div>
+      <div class="pcard popular">
+        <h3>Standart</h3>
+        <div class="price">95 AZN-dən</div>
+        <ul>
+          <li>Yağ dəyişimi</li>
+          <li>Yağ filtri</li>
+          <li>Hava filtri</li>
+          <li>İşçilik</li>
+        </ul>
       </div>
 
-      <div class="field"><label>Son km</label><input id="f_mileage" type="number" placeholder="96000" /></div>
-
-      <div class="field">
-        <label>Paket</label>
-        <select id="f_package">
-          <option>Ekonom</option>
-          <option selected>Standart</option>
-          <option>Full</option>
-        </select>
+      <div class="pcard">
+        <h3>Full</h3>
+        <div class="price">120 AZN-dən</div>
+        <ul>
+          <li>Yağ + yağ filtri</li>
+          <li>Hava filtri</li>
+          <li>Salon filtri</li>
+          <li>İşçilik</li>
+        </ul>
       </div>
+    </div>
+  </section>
 
-      <div class="grid2">
-        <div class="field"><label>Tarix</label><input id="f_date" type="date" /></div>
+  <section id="form">
+    <h2>Onlayn növbə</h2>
+
+    <div id="formWrap" class="formcard">
+      <form onsubmit="submitRequest(event)">
+        <div class="field"><label>Ad Soyad *</label><input id="f_name" /></div>
+        <div class="field"><label>Telefon *</label><input id="f_phone" type="tel" placeholder="0XX XXX XX XX" /></div>
+
+        <div class="grid2">
+          <div class="field"><label>Marka</label><input id="f_brand" placeholder="Toyota" /></div>
+          <div class="field"><label>Model</label><input id="f_model" placeholder="Corolla" /></div>
+        </div>
+
+        <div class="grid2">
+          <div class="field"><label>İl</label><input id="f_year" type="number" placeholder="2019" /></div>
+          <div class="field"><label>Dövlət nömrəsi</label><input id="f_plate" placeholder="90-YY-456" /></div>
+        </div>
+
+        <div class="field"><label>Son km</label><input id="f_mileage" type="number" placeholder="96000" /></div>
+
         <div class="field">
-          <label>Saat</label>
-          <select id="f_time">
-            <option>09:00</option><option>10:00</option><option>11:00</option>
-            <option>12:00</option><option>13:00</option><option>14:00</option>
-            <option>15:00</option><option>16:00</option><option>17:00</option>
-            <option>18:00</option>
+          <label>Paket</label>
+          <select id="f_package">
+            <option>Ekonom</option>
+            <option selected>Standart</option>
+            <option>Full</option>
           </select>
         </div>
-      </div>
 
-      <div class="field"><label>Qeyd</label><input id="f_note" placeholder="Əlavə qeydiniz" /></div>
+        <div class="grid2">
+          <div class="field"><label>Tarix</label><input id="f_date" type="date" /></div>
+          <div class="field">
+            <label>Saat</label>
+            <select id="f_time">
+              <option>09:00</option><option>10:00</option><option>11:00</option>
+              <option>12:00</option><option>13:00</option><option>14:00</option>
+              <option>15:00</option><option>16:00</option><option>17:00</option>
+              <option>18:00</option>
+            </select>
+          </div>
+        </div>
 
-      <button class="btn btn-blue" style="width:100%" type="submit">Növbə götür</button>
-    </form>
-  </div>
+        <div class="field"><label>Qeyd</label><input id="f_note" placeholder="Əlavə qeydiniz" /></div>
 
-  <div id="successMsg" class="success hidden">
-    <h3>Müraciətiniz qəbul edildi!</h3>
-    <p>Sizinlə tezliklə WhatsApp ilə əlaqə saxlanılacaq.</p>
-  </div>
-</section>
+        <button class="btn btn-blue" style="width:100%" type="submit">Növbə götür</button>
+      </form>
+    </div>
 
-<section>
-  <h2>Əlaqə</h2>
-  <div class="contact">
-    <div class="rowline"><span>Ünvan</span><strong>Bakı, Nərimanov rayonu</strong></div>
-    <div class="rowline"><span>Telefon</span><strong>070 876 78 49</strong></div>
-    <div class="rowline"><span>İş saatları</span><strong>09:00 – 19:00</strong></div>
-  </div>
-</section>
+    <div id="successMsg" class="success hidden">
+      <h3>Müraciətiniz qəbul edildi!</h3>
+      <p>Sizinlə tezliklə WhatsApp ilə əlaqə saxlanılacaq.</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= XİDMƏTLƏR ================= -->
+<div id="page-services" class="page hidden">
+  <section>
+    <h2>Xidmətlər</h2>
+
+    <div class="srow"><span>Yağ dəyişimi</span><strong>15 AZN</strong></div>
+    <div class="srow"><span>Yağ filtri dəyişimi</span><strong>10 AZN</strong></div>
+    <div class="srow"><span>Hava filtri dəyişimi</span><strong>12 AZN</strong></div>
+    <div class="srow"><span>Salon filtri dəyişimi</span><strong>15 AZN</strong></div>
+    <div class="srow"><span>Kompleks filtr dəyişimi</span><strong>30 AZN</strong></div>
+    <div class="srow"><span>Kompüter diaqnostikası</span><strong>25 AZN</strong></div>
+    <div class="srow"><span>Əyləc sistemi yoxlaması</span><strong>20 AZN</strong></div>
+    <div class="srow"><span>Akkumulyator yoxlaması</span><strong>10 AZN</strong></div>
+    <div class="srow"><span>Antifriz yoxlaması</span><strong>10 AZN</strong></div>
+    <div class="srow"><span>Şüşə yuyucusu doldurulması</span><strong>5 AZN</strong></div>
+
+    <p class="success" style="margin-top:12px">Qiymətlər təxminidir, avtomobilin modelinə görə dəyişə bilər.</p>
+
+    <button class="btn btn-blue" style="width:100%;margin-top:12px" onclick="goBooking()">Növbə götür</button>
+  </section>
+</div>
+
+<!-- ================= HAQQIMIZDA ================= -->
+<div id="page-about" class="page hidden">
+  <section>
+    <h2>Haqqımızda</h2>
+
+    <div class="stats-row">
+      <div class="stat"><div class="n">7+</div><div class="t">il təcrübə</div></div>
+      <div class="stat"><div class="n">5000+</div><div class="t">xidmət</div></div>
+      <div class="stat"><div class="n">30</div><div class="t">dəq orta müddət</div></div>
+    </div>
+
+    <div class="about-card">
+      <p>Oil Service Mərkəzi 2018-ci ildən bəri Bakıda avtomobillərə yağ dəyişimi və filtr xidmətləri göstərir. Komandamız 7 ildən artıq təcrübəyə malikdir və bu müddət ərzində 5000-dən çox avtomobilə xidmət göstərib.</p>
+      <p>Biz yalnız keyfiyyətli və yoxlanılmış yağlardan istifadə edirik. Hər avtomobilin km tarixçəsi qeyd olunur və növbəti yağ dəyişmə vaxtı çatanda müştəriyə əvvəlcədən xatırlatma göndərilir.</p>
+      <p>Məqsədimiz sadədir: sürətli, şəffaf və etibarlı xidmət. Yağ dəyişimi adətən 30 dəqiqə çəkir — bu müddətdə gözləmə otağımızda çayınız hazır olacaq.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= ƏLAQƏ ================= -->
+<div id="page-contact" class="page hidden">
+  <section>
+    <h2>Əlaqə</h2>
+
+    <div class="contact">
+      <div class="rowline"><span>Ünvan</span><strong>Bakı, Nəsimi rayonu, Rəsulzadə küçəsi 12</strong></div>
+      <div class="rowline"><span>Telefon</span><strong>070 876 78 49</strong></div>
+      <div class="rowline"><span>İş saatları</span><strong>09:00 – 19:00</strong></div>
+    </div>
+
+    <iframe
+      title="Xəritə"
+      src="https://www.google.com/maps?q=N%C9%99simi%20rayonu%2C%20Bak%C4%B1&output=embed"
+      style="width:100%;height:260px;border:0;border-radius:12px;margin-top:12px"
+      loading="lazy"></iframe>
+
+    <button class="btn btn-wa" style="width:100%;margin-top:12px" onclick="window.open('https://wa.me/994708767849','_blank')">WhatsApp ilə yazın</button>
+  </section>
+</div>
 
 <footer>© 2026 Oil Service Mərkəzi</footer>
 
@@ -180,6 +279,46 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 document.getElementById("f_date").min = new Date().toISOString().slice(0, 10);
+
+/* ---------- Səhifələr ---------- */
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(function (p) {
+    p.classList.add("hidden");
+  });
+
+  const el = document.getElementById("page-" + name);
+  if (el) el.classList.remove("hidden");
+
+  closeMenu();
+  window.scrollTo({ top: 0 });
+}
+
+function toggleMenu() {
+  document.getElementById("menuPanel").classList.toggle("hidden");
+}
+
+function closeMenu() {
+  document.getElementById("menuPanel").classList.add("hidden");
+}
+
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("menuPanel");
+  const burger = document.getElementById("burgerBtn");
+
+  if (!menu.classList.contains("hidden") && !menu.contains(e.target) && !burger.contains(e.target)) {
+    closeMenu();
+  }
+});
+
+function goBooking() {
+  showPage("home");
+  setTimeout(function () {
+    document.getElementById("form").scrollIntoView({ behavior: "smooth" });
+  }, 50);
+}
+
+/* ---------- Müraciət ---------- */
 
 function val(id) {
   return document.getElementById(id).value.trim();
