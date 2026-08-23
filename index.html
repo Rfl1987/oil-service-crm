@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oil Service CRM</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap hidden">
+  <div class="card login-card">
+    <h1 class="login-title">Oil Service CRM</h1>
+    <p class="small">İdarəetmə üçün daxil olun</p>
+
+    <form onsubmit="login(event)">
+      <div class="field">
+        <label>E-poçt</label>
+        <input id="login_email" type="email" required />
+      </div>
+
+      <div class="field">
+        <label>Şifrə</label>
+        <input id="login_password" type="password" required />
+      </div>
+
+      <button class="btn btn-blue btn-block" type="submit">Daxil ol</button>
+    </form>
+  </div>
+</div>
+
+<div id="appShell" class="hidden">
+
+<header>
+  <div class="head-row">
+    <div>
+      <h1>Oil Service CRM</h1>
+      <p>Yağ dəyişmə mərkəzi üçün idarəetmə sistemi</p>
+    </div>
+    <button class="btn btn-light" onclick="logout()">Çıxış</button>
+  </div>
+</header>
+
+<nav>
+  <button id="nav-dashboard" class="active" onclick="showView('dashboard')">Dashboard</button>
+  <button id="nav-customers" onclick="showView('customers')">Müştərilər</button>
+  <button id="nav-vehicles" onclick="showView('vehicles')">Avtomobillər</button>
+  <button id="nav-order" onclick="showView('order')">Sifarişlər</button>
+</nav>
+
+<main>
+
+  <section id="view-dashboard" class="view">
+    <div id="dashboard" class="stats"></div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>Yaxınlaşan xatırlatmalar</h2>
+      <div id="reminders"></div>
+    </div>
+  </section>
+
+  <section id="view-customers" class="view hidden">
+    <div class="card">
+      <div class="card-head">
+        <h2>Müştərilər</h2>
+        <button class="btn btn-green" onclick="toggleCustomerForm()">+ Yeni müştəri</button>
+      </div>
+
+      <form id="customerForm" class="hidden" onsubmit="addCustomer(event)">
+        <div class="field">
+          <label>Ad Soyad *</label>
+          <input id="c_name" />
+        </div>
+        <div class="field">
+          <label>Telefon</label>
+          <input id="c_phone" placeholder="0501234567" />
+        </div>
+        <div class="field">
+          <label>WhatsApp</label>
+          <input id="c_whatsapp" placeholder="994501234567" />
+        </div>
+        <div class="field">
+          <label>Qeyd</label>
+          <input id="c_note" />
+        </div>
+        <div class="row">
+          <button type="submit" class="btn btn-blue">Yadda saxla</button>
+          <button type="button" class="btn btn-gray" onclick="toggleCustomerForm()">Bağla</button>
+        </div>
+      </form>
+
+      <div id="customers"></div>
+    </div>
+  </section>
+
+  <section id="view-vehicles" class="view hidden">
+    <div class="card">
+      <div class="card-head">
+        <h2>Avtomobillər</h2>
+        <button class="btn btn-green" onclick="toggleVehicleForm()">+ Yeni avtomobil</button>
+      </div>
+
+      <form id="vehicleForm" class="hidden" onsubmit="addVehicle(event)">
+        <div class="field">
+          <label>Müştəri *</label>
+          <select id="v_customer"></select>
+        </div>
+        <div class="field">
+          <label>Marka *</label>
+          <input id="v_brand" placeholder="BMW" />
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input id="v_model" placeholder="F30" />
+        </div>
+        <div class="field">
+          <label>İl</label>
+          <input id="v_year" placeholder="2015" type="number" />
+        </div>
+        <div class="field">
+          <label>Dövlət nömrəsi</label>
+          <input id="v_plate" placeholder="10-XX-123" />
+        </div>
+        <div class="field">
+          <label>Son km</label>
+          <input id="v_mileage" placeholder="182400" type="number" />
+        </div>
+        <div class="row">
+          <button type="submit" class="btn btn-blue">Yadda saxla</button>
+          <button type="button" class="btn btn-gray" onclick="toggleVehicleForm()">Bağla</button>
+        </div>
+      </form>
+
+      <div id="vehicles"></div>
+    </div>
+  </section>
+
+  <section id="view-order" class="view hidden">
+    <div class="card">
+      <div class="card-head">
+        <h2>Sifarişlər</h2>
+        <button class="btn btn-green" onclick="toggleOrderForm()">+ Yeni yağ dəyişimi</button>
+      </div>
+
+      <form id="orderForm" class="hidden" onsubmit="addOrder(event)">
+        <div class="field">
+          <label>Müştəri *</label>
+          <select id="o_customer" onchange="loadOrderVehicles()"></select>
+        </div>
+
+        <div class="field">
+          <label>Avtomobil *</label>
+          <select id="o_vehicle" onchange="prefillMileage()"></select>
+        </div>
+
+        <div class="field">
+          <label>Son km *</label>
+          <input id="o_mileage" type="number" placeholder="182400" />
+        </div>
+
+        <div class="field">
+          <label>Paket</label>
+          <select id="o_package">
+            <option value="Ekonom">Ekonom</option>
+            <option value="Standart" selected>Standart</option>
+            <option value="Full">Full</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Məbləğ (AZN)</label>
+          <input id="o_amount" type="number" placeholder="95" />
+        </div>
+
+        <div class="field">
+          <label>Qeyd</label>
+          <input id="o_note" />
+        </div>
+
+        <div class="row">
+          <button type="submit" class="btn btn-blue">Sifariş yarat</button>
+          <button type="button" class="btn btn-gray" onclick="toggleOrderForm()">Bağla</button>
+        </div>
+      </form>
+
+      <div id="orders"></div>
+    </div>
+  </section>
+
+</main>
+
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
