@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oil Service Mərkəzi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root { --blue:#1d4ed8; --green:#16a34a; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#f6f7f9; color:#111827; }
+.hidden { display:none; }
+
+header { background:var(--blue); color:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; }
+header .logo { font-weight:700; font-size:18px; }
+header a { color:#fff; text-decoration:none; background:rgba(255,255,255,.15); padding:8px 12px; border-radius:10px; font-size:14px; }
+
+.hero { background:var(--blue); color:#fff; padding:28px 16px 36px; text-align:center; }
+.hero h1 { margin:0 0 8px; font-size:26px; }
+.hero p { margin:0 0 18px; color:#dbeafe; font-size:15px; }
+.hero .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+.btn { border:none; border-radius:12px; padding:14px 18px; font-size:15px; font-weight:600; cursor:pointer; }
+.btn-white { background:#fff; color:var(--blue); }
+.btn-green { background:var(--green); color:#fff; }
+.btn-blue { background:var(--blue); color:#fff; }
+
+section { padding:20px 16px; max-width:720px; margin:0 auto; }
+h2 { font-size:20px; margin:0 0 12px; }
+
+.cards { display:grid; grid-template-columns:1fr; gap:12px; }
+@media (min-width:640px) { .cards { grid-template-columns:repeat(3,1fr); } }
+
+.pcard { background:#fff; border-radius:14px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.08); border-top:4px solid var(--blue); }
+.pcard.popular { border-top-color:var(--green); }
+.pcard h3 { margin:0 0 6px; font-size:17px; }
+.pcard .price { font-size:20px; font-weight:800; margin:6px 0; }
+.pcard ul { margin:0; padding-left:18px; font-size:14px; color:#374151; }
+
+.formcard { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.field { margin-bottom:12px; }
+.field label { display:block; font-size:13px; color:#374151; margin-bottom:4px; }
+.field input, .field select { width:100%; padding:12px; border:1px solid #d1d5db; border-radius:10px; font-size:15px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.contact { background:#fff; border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); font-size:15px; }
+.contact .rowline { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; }
+
+footer { padding:20px; text-align:center; font-size:13px; color:#6b7280; }
+
+.success { background:#ecfdf5; border:1px solid #a7f3d0; border-radius:14px; padding:20px; text-align:center; }
+.success h3 { margin:0 0 6px; color:#047857; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Oil Service Mərkəzi</div>
+  <a href="https://wa.me/994708767849" target="_blank">WhatsApp</a>
+</header>
+
+<div class="hero">
+  <h1>Yağ dəyişimi 30 dəqiqəyə</h1>
+  <p>Onlayn növbə götürün — sizə WhatsApp ilə təsdiq göndərək.</p>
+  <div class="btns">
+    <button class="btn btn-white" onclick="document.getElementById('form').scrollIntoView({behavior:'smooth'})">Növbə götür</button>
+    <button class="btn btn-green" onclick="window.open('https://wa.me/994708767849','_blank')">WhatsApp</button>
+  </div>
+</div>
+
+<section>
+  <h2>Paketlər</h2>
+  <div class="cards">
+    <div class="pcard">
+      <h3>Ekonom</h3>
+      <div class="price">70 AZN-dən</div>
+      <ul>
+        <li>Yağ dəyişimi</li>
+        <li>Yağ filtri</li>
+        <li>İşçilik</li>
+      </ul>
+    </div>
+
+    <div class="pcard popular">
+      <h3>Standart</h3>
+      <div class="price">95 AZN-dən</div>
+      <ul>
+        <li>Yağ dəyişimi</li>
+        <li>Yağ filtri</li>
+        <li>Hava filtri</li>
+        <li>İşçilik</li>
+      </ul>
+    </div>
+
+    <div class="pcard">
+      <h3>Full</h3>
+      <div class="price">120 AZN-dən</div>
+      <ul>
+        <li>Yağ + yağ filtri</li>
+        <li>Hava filtri</li>
+        <li>Salon filtri</li>
+        <li>İşçilik</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="form">
+  <h2>Onlayn növbə</h2>
+
+  <div id="formWrap" class="formcard">
+    <form onsubmit="submitRequest(event)">
+      <div class="field"><label>Ad Soyad *</label><input id="f_name" /></div>
+      <div class="field"><label>Telefon *</label><input id="f_phone" type="tel" placeholder="0XX XXX XX XX" /></div>
+
+      <div class="grid2">
+        <div class="field"><label>Marka</label><input id="f_brand" placeholder="Toyota" /></div>
+        <div class="field"><label>Model</label><input id="f_model" placeholder="Corolla" /></div>
+      </div>
+
+      <div class="grid2">
+        <div class="field"><label>İl</label><input id="f_year" type="number" placeholder="2019" /></div>
+        <div class="field"><label>Dövlət nömrəsi</label><input id="f_plate" placeholder="90-YY-456" /></div>
+      </div>
+
+      <div class="field"><label>Son km</label><input id="f_mileage" type="number" placeholder="96000" /></div>
+
+      <div class="field">
+        <label>Paket</label>
+        <select id="f_package">
+          <option>Ekonom</option>
+          <option selected>Standart</option>
+          <option>Full</option>
+        </select>
+      </div>
+
+      <div class="grid2">
+        <div class="field"><label>Tarix</label><input id="f_date" type="date" /></div>
+        <div class="field">
+          <label>Saat</label>
+          <select id="f_time">
+            <option>09:00</option><option>10:00</option><option>11:00</option>
+            <option>12:00</option><option>13:00</option><option>14:00</option>
+            <option>15:00</option><option>16:00</option><option>17:00</option>
+            <option>18:00</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field"><label>Qeyd</label><input id="f_note" placeholder="Əlavə qeydiniz" /></div>
+
+      <button class="btn btn-blue" style="width:100%" type="submit">Növbə götür</button>
+    </form>
+  </div>
+
+  <div id="successMsg" class="success hidden">
+    <h3>Müraciətiniz qəbul edildi!</h3>
+    <p>Sizinlə tezliklə WhatsApp ilə əlaqə saxlanılacaq.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Əlaqə</h2>
+  <div class="contact">
+    <div class="rowline"><span>Ünvan</span><strong>Bakı, Nərimanov rayonu</strong></div>
+    <div class="rowline"><span>Telefon</span><strong>070 876 78 49</strong></div>
+    <div class="rowline"><span>İş saatları</span><strong>09:00 – 19:00</strong></div>
+  </div>
+</section>
+
+<footer>© 2026 Oil Service Mərkəzi</footer>
+
+<script>
+const SUPABASE_URL = "https://cvpnglfptxxzmarqqyuk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2cG5nbGZwdHh4em1hcnFxeXVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MTU5MzQsImV4cCI6MjEwMjk5MTkzNH0.hThXY0RMZg38E4D5UCb9aAFb83DnJaBw5kGyW55i4cY";
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+document.getElementById("f_date").min = new Date().toISOString().slice(0, 10);
+
+function val(id) {
+  return document.getElementById(id).value.trim();
+}
+
+async function submitRequest(e) {
+  e.preventDefault();
+
+  const name = val("f_name");
+  const phone = val("f_phone");
+
+  if (!name || !phone) {
+    alert("Ad və telefon mütləqdir");
+    return;
+  }
+
+  const payload = {
+    full_name: name,
+    phone: phone,
+    whatsapp_phone: phone.replace(/\D/g, ""),
+    brand: val("f_brand") || null,
+    model: val("f_model") || null,
+    year: parseInt(val("f_year"), 10) || null,
+    plate_number: val("f_plate") || null,
+    mileage: parseInt(val("f_mileage"), 10) || null,
+    package: val("f_package"),
+    preferred_date: val("f_date") || null,
+    preferred_time: val("f_time"),
+    note: val("f_note") || null
+  };
+
+  const { error } = await db.from("service_requests").insert([payload]);
+
+  if (error) {
+    alert("Xəta: " + error.message);
+    return;
+  }
+
+  document.getElementById("formWrap").classList.add("hidden");
+  document.getElementById("successMsg").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
