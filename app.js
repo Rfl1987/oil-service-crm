@@ -15,6 +15,17 @@ const EXTRA_SERVICES = [
   { name: "Şüşə yuyucusu doldurulması", price: 5 }
 ];
 
+/* ---------- XSS qorunması ---------- */
+function esc(s) {
+  if (s === null || s === undefined) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /* ---------- Auth ---------- */
 async function initAuth() {
   const { data } = await db.auth.getSession();
@@ -132,7 +143,7 @@ async function loadReminders() {
     .from("service_orders")
     .select("*, customers(full_name, phone, whatsapp_phone), vehicles(brand, model, plate_number, last_mileage)")
     .order("created_at", { ascending: false });
-  if (error) { box.innerHTML = '<div class="error">Xəta: ' + error.message + "</div>"; return; }
+  if (error) { box.innerHTML = '<div class="error">Xəta: ' + esc(error.message) + "</div>"; return; }
 
   const latestByVehicle = {};
   (data || []).forEach(function (ord) {
@@ -153,14 +164,14 @@ async function loadReminders() {
   box.innerHTML = "";
   dueList.forEach(function (ord) {
     remindersCache[ord.id] = ord;
-    const vehicleText = ord.vehicles ? ord.vehicles.brand + " " + ord.vehicles.model + " (" + (ord.vehicles.plate_number || "-") + ")" : "-";
+    const vehicleText = ord.vehicles ? esc(ord.vehicles.brand) + " " + esc(ord.vehicles.model) + " (" + esc(ord.vehicles.plate_number || "-") + ")" : "-";
     const card = document.createElement("div");
     card.className = "item";
     card.innerHTML =
-      '<div class="name">' + (ord.customers ? ord.customers.full_name : "-") + "</div>" +
+      '<div class="name">' + esc(ord.customers ? ord.customers.full_name : "-") + "</div>" +
       '<div class="small">' + vehicleText + "</div>" +
-      '<div class="small">Son km: ' + (ord.vehicles ? ord.vehicles.last_mileage : "-") + "</div>" +
-      '<div class="small">Növbəti servis: ' + (ord.next_service_km || "-") + " km</div>" +
+      '<div class="small">Son km: ' + esc(ord.vehicles ? ord.vehicles.last_mileage : "-") + "</div>" +
+      '<div class="small">Növbəti servis: ' + esc(ord.next_service_km || "-") + " km</div>" +
       '<div class="row" style="margin-top:8px"><button class="btn btn-green" onclick="sendReminder(\'' + ord.id + '\')">Xatırlatma göndər</button></div>';
     box.appendChild(card);
   });
@@ -182,17 +193,17 @@ async function loadCustomers() {
   const box = document.getElementById("customers");
   box.innerHTML = '<div class="small">Yüklənir...</div>';
   const { data, error } = await db.from("customers").select("*").order("created_at", { ascending: false });
-  if (error) { box.innerHTML = '<div class="error">Xəta: ' + error.message + "</div>"; return; }
+  if (error) { box.innerHTML = '<div class="error">Xəta: ' + esc(error.message) + "</div>"; return; }
   if (!data || data.length === 0) { box.innerHTML = '<div class="small">Hələ müştəri yoxdur.</div>'; return; }
   box.innerHTML = "";
   data.forEach(function (c) {
     const card = document.createElement("div");
     card.className = "item";
     card.innerHTML =
-      '<div class="name">' + c.full_name + "</div>" +
-      '<div class="small">Telefon: ' + (c.phone || "-") + "</div>" +
-      '<div class="small">WhatsApp: ' + (c.whatsapp_phone || "-") + "</div>" +
-      (c.note ? '<div class="small">' + c.note + "</div>" : "");
+      '<div class="name">' + esc(c.full_name) + "</div>" +
+      '<div class="small">Telefon: ' + esc(c.phone || "-") + "</div>" +
+      '<div class="small">WhatsApp: ' + esc(c.whatsapp_phone || "-") + "</div>" +
+      (c.note ? '<div class="small">' + esc(c.note) + "</div>" : "");
     box.appendChild(card);
   });
 }
@@ -222,17 +233,17 @@ async function loadVehicles() {
   const box = document.getElementById("vehicles");
   box.innerHTML = '<div class="small">Yüklənir...</div>';
   const { data, error } = await db.from("vehicles").select("*, customers(full_name)").order("created_at", { ascending: false });
-  if (error) { box.innerHTML = '<div class="error">Xəta: ' + error.message + "</div>"; return; }
+  if (error) { box.innerHTML = '<div class="error">Xəta: ' + esc(error.message) + "</div>"; return; }
   if (!data || data.length === 0) { box.innerHTML = '<div class="small">Hələ avtomobil yoxdur.</div>'; return; }
   box.innerHTML = "";
   data.forEach(function (v) {
     const card = document.createElement("div");
     card.className = "item";
     card.innerHTML =
-      '<div class="name">' + (v.brand || "") + " " + (v.model || "") + "</div>" +
-      '<div class="small">Nömrə: ' + (v.plate_number || "-") + "</div>" +
-      '<div class="small">Müştəri: ' + ((v.customers && v.customers.full_name) || "-") + "</div>" +
-      '<div class="small">Son km: ' + (v.last_mileage || "-") + "</div>";
+      '<div class="name">' + esc(v.brand || "") + " " + esc(v.model || "") + "</div>" +
+      '<div class="small">Nömrə: ' + esc(v.plate_number || "-") + "</div>" +
+      '<div class="small">Müştəri: ' + esc((v.customers && v.customers.full_name) || "-") + "</div>" +
+      '<div class="small">Son km: ' + esc(v.last_mileage || "-") + "</div>";
     box.appendChild(card);
   });
 }
@@ -275,7 +286,7 @@ async function loadRequests() {
   const box = document.getElementById("requests");
   box.innerHTML = '<div class="small">Yüklənir...</div>';
   const { data, error } = await db.from("service_requests").select("*").order("created_at", { ascending: false });
-  if (error) { box.innerHTML = '<div class="error">Xəta: ' + error.message + "</div>"; return; }
+  if (error) { box.innerHTML = '<div class="error">Xəta: ' + esc(error.message) + "</div>"; return; }
   if (!data || data.length === 0) { box.innerHTML = '<div class="small">Hələ müraciət yoxdur.</div>'; return; }
   requestsCache = {};
   data.forEach(function (r) { requestsCache[r.id] = r; });
@@ -287,15 +298,15 @@ async function loadRequests() {
       ? '<span class="tag tag-converted">Sifarişə çevrilib</span>'
       : '<span class="tag tag-new">Yeni</span>';
     const appt = (r.preferred_date || r.preferred_time)
-      ? '<div class="small">Növbə: ' + (r.preferred_date || "-") + " " + (r.preferred_time || "") + "</div>"
+      ? '<div class="small">Növbə: ' + esc(r.preferred_date || "-") + " " + esc(r.preferred_time || "") + "</div>"
       : "";
     card.innerHTML =
-      '<div class="name">' + r.full_name + tag + "</div>" +
-      '<div class="small">Telefon: ' + (r.phone || "-") + "</div>" +
-      '<div class="small">Avtomobil: ' + (r.brand || "-") + " " + (r.model || "-") + " (" + (r.plate_number || "-") + ")</div>" +
-      '<div class="small">Km: ' + (r.mileage || "-") + " | Paket: " + (r.package || "-") + "</div>" +
+      '<div class="name">' + esc(r.full_name) + tag + "</div>" +
+      '<div class="small">Telefon: ' + esc(r.phone || "-") + "</div>" +
+      '<div class="small">Avtomobil: ' + esc(r.brand || "-") + " " + esc(r.model || "-") + " (" + esc(r.plate_number || "-") + ")</div>" +
+      '<div class="small">Km: ' + esc(r.mileage || "-") + " | Paket: " + esc(r.package || "-") + "</div>" +
       appt +
-      (r.note ? '<div class="small">Qeyd: ' + r.note + "</div>" : "") +
+      (r.note ? '<div class="small">Qeyd: ' + esc(r.note) + "</div>" : "") +
       '<div class="row" style="margin-top:8px">' +
       (r.status !== "converted" ? '<button class="btn btn-blue" onclick="convertRequest(\'' + r.id + '\')">Sifarişə çevir</button>' : "") +
       '<button class="btn btn-green" onclick="requestWhatsApp(\'' + r.id + '\')">WhatsApp</button>' +
@@ -455,7 +466,7 @@ async function loadOrders() {
   const { data, error } = await db.from("service_orders")
     .select("*, customers(full_name, phone, whatsapp_phone), vehicles(brand, model, plate_number)")
     .order("created_at", { ascending: false });
-  if (error) { box.innerHTML = '<div class="error">Xəta: ' + error.message + "</div>"; return; }
+  if (error) { box.innerHTML = '<div class="error">Xəta: ' + esc(error.message) + "</div>"; return; }
   if (!data || data.length === 0) { box.innerHTML = '<div class="small">Hələ sifariş yoxdur.</div>'; return; }
   ordersCache = {};
   data.forEach(function (o) { ordersCache[o.id] = o; });
@@ -464,15 +475,15 @@ async function loadOrders() {
     const card = document.createElement("div");
     card.className = "item order-card";
     card.onclick = function () { openOrderModal(o.id); };
-    const vehicleText = o.vehicles ? o.vehicles.brand + " " + o.vehicles.model + " (" + (o.vehicles.plate_number || "-") + ")" : "-";
+    const vehicleText = o.vehicles ? esc(o.vehicles.brand) + " " + esc(o.vehicles.model) + " (" + esc(o.vehicles.plate_number || "-") + ")" : "-";
     const appt = (o.appointment_date || o.appointment_time)
-      ? '<div class="small">Növbə: ' + (o.appointment_date || "-") + " " + (o.appointment_time || "") + "</div>"
+      ? '<div class="small">Növbə: ' + esc(o.appointment_date || "-") + " " + esc(o.appointment_time || "") + "</div>"
       : "";
     card.innerHTML =
-      '<div class="name">' + o.order_number + " — " + (o.customers ? o.customers.full_name : "-") + "</div>" +
+      '<div class="name">' + esc(o.order_number) + " — " + esc(o.customers ? o.customers.full_name : "-") + "</div>" +
       '<div class="small">' + vehicleText + "</div>" +
-      '<div class="small">Km: ' + (o.mileage || "-") + " | Paket: " + (o.package || "-") + "</div>" +
-      '<div class="small">Məbləğ: ' + (o.total_amount || 0) + " AZN | Ödəniş: " + (o.payment_status === "paid" ? "Ödənilib" : "Ödənilməyib") + "</div>" +
+      '<div class="small">Km: ' + esc(o.mileage || "-") + " | Paket: " + esc(o.package || "-") + "</div>" +
+      '<div class="small">Məbləğ: ' + esc(o.total_amount || 0) + " AZN | Ödəniş: " + (o.payment_status === "paid" ? "Ödənilib" : "Ödənilməyib") + "</div>" +
       appt;
     box.appendChild(card);
   });
@@ -532,7 +543,7 @@ function buildExtrasPanel(o) {
     const checked = saved.indexOf(s.name) !== -1;
     const label = document.createElement("label");
     label.innerHTML =
-      '<span><input type="checkbox" data-name="' + s.name + '" data-price="' + s.price + '" onchange="onExtraToggle(this)"' + (checked ? " checked" : "") + "> " + s.name + "</span>" +
+      '<span><input type="checkbox" data-name="' + s.name + '" data-price="' + s.price + '" onchange="onExtraToggle(this)"' + (checked ? " checked" : "") + "> " + esc(s.name) + "</span>" +
       "<strong>+" + s.price + " AZN</strong>";
     panel.appendChild(label);
   });
@@ -561,14 +572,14 @@ async function openCustomerDetail() {
 
   let html = "";
   if (customer) {
-    html += '<div class="small">Telefon: ' + (customer.phone || "-") + "</div>";
-    html += '<div class="small">WhatsApp: ' + (customer.whatsapp_phone || "-") + "</div>";
+    html += '<div class="small">Telefon: ' + esc(customer.phone || "-") + "</div>";
+    html += '<div class="small">WhatsApp: ' + esc(customer.whatsapp_phone || "-") + "</div>";
   }
 
   html += '<h4 class="fin-h">Avtomobillər</h4>';
   if (vehicles && vehicles.length > 0) {
     vehicles.forEach(function (v) {
-      html += '<div class="srow-fin"><span>' + (v.brand || "") + " " + (v.model || "") + " (" + (v.plate_number || "-") + ')</span><strong>' + (v.last_mileage || "-") + " km</strong></div>";
+      html += '<div class="srow-fin"><span>' + esc(v.brand || "") + " " + esc(v.model || "") + " (" + esc(v.plate_number || "-") + ')</span><strong>' + esc(v.last_mileage || "-") + " km</strong></div>";
     });
   } else {
     html += '<div class="small">Avtomobil yoxdur.</div>';
@@ -578,16 +589,16 @@ async function openCustomerDetail() {
   if (orders && orders.length > 0) {
     orders.forEach(function (ord) {
       const extras = (ord.extra_services || "").split("|").filter(Boolean);
-      const extrasHtml = extras.map(function (e) { return '<div class="small" style="margin-left:12px">+ ' + e + "</div>"; }).join("");
+      const extrasHtml = extras.map(function (e) { return '<div class="small" style="margin-left:12px">+ ' + esc(e) + "</div>"; }).join("");
       html +=
         '<div class="srow-fin" style="flex-direction:column; align-items:flex-start; gap:4px">' +
           '<div style="display:flex; justify-content:space-between; width:100%">' +
-            '<strong>' + ord.order_number + " • " + (ord.created_at ? fmtDate(new Date(ord.created_at)) : "-") + "</strong>" +
-            "<span>" + (ord.total_amount || 0) + " AZN</span>" +
+            '<strong>' + esc(ord.order_number) + " • " + esc(ord.created_at ? fmtDate(new Date(ord.created_at)) : "-") + "</strong>" +
+            "<span>" + esc(ord.total_amount || 0) + " AZN</span>" +
           "</div>" +
-          '<div class="small">Paket: ' + (ord.package || "-") + "</div>" +
+          '<div class="small">Paket: ' + esc(ord.package || "-") + "</div>" +
           extrasHtml +
-          '<div class="small">' + (STATUS_LABELS[ord.status] || ord.status) + "</div>" +
+          '<div class="small">' + esc(STATUS_LABELS[ord.status] || ord.status) + "</div>" +
         "</div>";
     });
   } else {
@@ -654,14 +665,14 @@ async function loadFinance() {
   ]);
   financeData.income = (inc.data || []).map(function (o) {
     return {
-      label: o.order_number + " — " + (o.customers ? o.customers.full_name : "-"),
+      label: esc(o.order_number) + " — " + esc(o.customers ? o.customers.full_name : "-"),
       amount: Number(o.total_amount || 0),
       date: o.finished_at ? fmtDate(new Date(o.finished_at)) : null
     };
   }).filter(function (x) { return x.date; });
   financeData.expenses = (exp.data || []).map(function (x) {
     return {
-      label: x.title + " (" + (x.category || "Digər") + ")",
+      label: esc(x.title) + " (" + esc(x.category || "Digər") + ")",
       amount: Number(x.amount || 0),
       date: x.expense_date || null
     };
