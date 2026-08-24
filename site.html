@@ -45,7 +45,6 @@ header {
 }
 .icon-btn.wa { background:var(--wa); box-shadow:0 4px 14px rgba(37,211,102,.4); }
 
-/* ---------- HERO ---------- */
 .hero {
   background:
     linear-gradient(rgba(8,12,24,.65), rgba(8,12,24,.95)),
@@ -58,7 +57,6 @@ header {
 .hero p { margin:0 0 24px; color:#e2e8f0; font-size:15px; }
 .hero .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
-/* ---------- ANIMATED CHIPS ---------- */
 .chips { 
   display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:24px; 
   opacity: 0;
@@ -115,7 +113,6 @@ header {
   to { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.9)); }
 }
 
-/* ---------- BUTTONS & LINKS ---------- */
 .btn {
   border:none; border-radius:999px; padding:14px 22px;
   font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;
@@ -140,7 +137,6 @@ header {
   font-family:inherit;
 }
 
-/* ---------- SECTIONS ---------- */
 section { padding:20px 16px; max-width:720px; margin:0 auto; }
 h2 { font-size:20px; margin:0 0 14px; font-weight:800; }
 h2::after {
@@ -496,10 +492,17 @@ async function submitRequest(e) {
     return;
   }
 
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length !== 10 || digits[0] !== "0") {
+    alert("Telefon nömrəsi 10 rəqəm olmalıdır (0XX XXX XX XX)");
+    return;
+  }
+
   const payload = {
     full_name: name,
-    phone: phone,
-    whatsapp_phone: phone.replace(/\D/g, ""),
+    phone: digits,
+    whatsapp_phone: "994" + digits.slice(1),
     brand: val("f_brand") || null,
     model: val("f_model") || null,
     year: parseInt(val("f_year"), 10) || null,
