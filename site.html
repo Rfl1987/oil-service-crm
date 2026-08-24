@@ -213,7 +213,7 @@ footer { padding:20px; text-align:center; font-size:13px; color:var(--muted); }
 
     <div id="formWrap" class="formcard">
       <form onsubmit="submitRequest(event)">
-        <div class="field"><label>Ad Soyad *</label><input id="f_name" /></div>
+        <div class="field"><label>Ad Soyad * (6-21 hərf)</label><input id="f_name" /></div>
         <div class="field"><label>Telefon * (0 ilə başlayan 10 rəqəm)</label><input id="f_phone" type="tel" placeholder="0501234567" /></div>
 
         <!-- Honeypot: insanlar görmür, botlar doldurur -->
@@ -223,13 +223,13 @@ footer { padding:20px; text-align:center; font-size:13px; color:var(--muted); }
         </div>
 
         <div class="grid2">
-          <div class="field"><label>Marka</label><input id="f_brand" placeholder="Toyota" /></div>
-          <div class="field"><label>Model</label><input id="f_model" placeholder="Corolla" /></div>
+          <div class="field"><label>Marka (3-13 hərf)</label><input id="f_brand" placeholder="Toyota" /></div>
+          <div class="field"><label>Model (2-14 hərf/rəqəm)</label><input id="f_model" placeholder="Corolla" /></div>
         </div>
 
         <div class="grid2">
           <div class="field"><label>İl</label><input id="f_year" type="number" placeholder="2019" /></div>
-          <div class="field"><label>Dövlət nömrəsi</label><input id="f_plate" placeholder="90-YY-456" /></div>
+          <div class="field"><label>Dövlət nömrəsi (90YP292)</label><input id="f_plate" placeholder="90YP292" /></div>
         </div>
 
         <div class="field"><label>Son km</label><input id="f_mileage" type="number" placeholder="96000" /></div>
@@ -383,9 +383,35 @@ function goBooking() {
   }, 50);
 }
 
-/* ---------- Müraciət ---------- */
+/* ---------- Validasiya ---------- */
 function val(id) { return document.getElementById(id).value.trim(); }
 
+const LETTERS_ONLY = /^[A-Za-zÇçƏəĞğİıÖöŞşÜü ]+$/;
+const ALNUM_MIX = /^[A-Za-zÇçƏəĞğİıÖöŞşÜü0-9 -]+$/;
+
+function validateName(v) {
+  if (v.length < 6 || v.length > 21) return "Ad Soyad 6-21 simvol olmalıdır";
+  if (!LETTERS_ONLY.test(v)) return "Ad Soyad yalnız hərflərdən ibarət olmalıdır (rəqəm və simvol olmaz)";
+  return null;
+}
+function validateBrand(v) {
+  if (!v) return null;
+  if (v.length < 3 || v.length > 13) return "Marka 3-13 hərf olmalıdır";
+  if (!LETTERS_ONLY.test(v)) return "Marka yalnız hərflərdən ibarət olmalıdır";
+  return null;
+}
+function validateModel(v) {
+  if (!v) return null;
+  if (v.length < 2 || v.length > 14) return "Model 2-14 simvol olmalıdır (hərf/rəqəm)";
+  if (!ALNUM_MIX.test(v)) return "Model yalnız hərf, rəqəm, defis və boşluqdan ibarət ola bilər";
+  return null;
+}
+function validatePlate(v) {
+  if (!v) return null;
+  const c = v.replace(/[-\s]/g, "").toUpperCase();
+  if (!/^\d{2}[A-Z]{2}\d{3}$/.test(c)) return "Dövlət nömrəsi belə olmalıdır: 90YP292 (2 rəqəm, 2 hərf, 3 rəqəm)";
+  return null;
+}
 function validatePhone(phone) {
   const digits = phone.replace(/\D/g, "");
   if (digits.length !== 10 || !digits.startsWith("0")) {
@@ -394,33 +420,44 @@ function validatePhone(phone) {
   return null;
 }
 
+/* ---------- Müraciət ---------- */
 async function submitRequest(e) {
   e.preventDefault();
 
   const name = val("f_name");
   const phone = val("f_phone");
+  const brand = val("f_brand");
+  const model = val("f_model");
+  const plate = val("f_plate");
 
   if (!name || !phone) { alert("Ad və telefon mütləqdir"); return; }
 
-  const phoneErr = validatePhone(phone);
-  if (phoneErr) { alert(phoneErr); return; }
+  const errs = [
+    validateName(name),
+    validatePhone(phone),
+    validateBrand(brand),
+    validateModel(model),
+    validatePlate(plate)
+  ].filter(Boolean);
+
+  if (errs.length > 0) { alert(errs[0]); return; }
 
   /* Honeypot: botlar bu gizli sahəni doldurur, insanlar yox */
   if (val("f_website") !== "") {
-    /* Botu aldadırıq: uğur mesajı göstəririk, amma DB-yə yazmırıq */
-    document.getElementById("formWrap").classList.add("hidden");
-    document.getElementById("successMsg").classList.remove("hidden");
+    showSuccess();
     return;
   }
+
+  const cleanPlate = plate ? plate.replace(/[-\s]/g, "").toUpperCase() : null;
 
   const payload = {
     full_name: name,
     phone: phone,
     whatsapp_phone: "994" + phone.slice(1),
-    brand: val("f_brand") || null,
-    model: val("f_model") || null,
+    brand: brand || null,
+    model: model || null,
     year: parseInt(val("f_year"), 10) || null,
-    plate_number: val("f_plate") || null,
+    plate_number: cleanPlate,
     mileage: parseInt(val("f_mileage"), 10) || null,
     package: val("f_package"),
     preferred_date: val("f_date") || null,
@@ -431,8 +468,14 @@ async function submitRequest(e) {
   const { error } = await db.from("service_requests").insert([payload]);
   if (error) { alert("Xəta: " + error.message); return; }
 
+  showSuccess();
+}
+
+function showSuccess() {
   document.getElementById("formWrap").classList.add("hidden");
-  document.getElementById("successMsg").classList.remove("hidden");
+  const s = document.getElementById("successMsg");
+  s.classList.remove("hidden");
+  s.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 </script>
 
