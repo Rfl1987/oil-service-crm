@@ -125,6 +125,7 @@ h2::after { content:""; display:block; width:42px; height:4px; border-radius:2px
 }
 .field input:focus, .field select:focus { outline:none; border-color:var(--amber); box-shadow:0 0 0 3px rgba(245,158,11,.15); }
 .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.hp-field { display:none; }
 
 .contact { background:#fff; border-radius:18px; padding:18px; box-shadow:0 10px 30px rgba(2,6,23,.08); font-size:15px; }
 .contact .rowline { display:flex; justify-content:space-between; gap:8px; padding:10px 0; border-bottom:1px solid #f1f5f9; }
@@ -214,6 +215,12 @@ footer { padding:20px; text-align:center; font-size:13px; color:var(--muted); }
       <form onsubmit="submitRequest(event)">
         <div class="field"><label>Ad Soyad *</label><input id="f_name" /></div>
         <div class="field"><label>Telefon * (0 ilə başlayan 10 rəqəm)</label><input id="f_phone" type="tel" placeholder="0501234567" /></div>
+
+        <!-- Honeypot: insanlar görmür, botlar doldurur -->
+        <div class="field hp-field">
+          <label>Website</label>
+          <input id="f_website" tabindex="-1" autocomplete="off" />
+        </div>
 
         <div class="grid2">
           <div class="field"><label>Marka</label><input id="f_brand" placeholder="Toyota" /></div>
@@ -397,6 +404,14 @@ async function submitRequest(e) {
 
   const phoneErr = validatePhone(phone);
   if (phoneErr) { alert(phoneErr); return; }
+
+  /* Honeypot: botlar bu gizli sahəni doldurur, insanlar yox */
+  if (val("f_website") !== "") {
+    /* Botu aldadırıq: uğur mesajı göstəririk, amma DB-yə yazmırıq */
+    document.getElementById("formWrap").classList.add("hidden");
+    document.getElementById("successMsg").classList.remove("hidden");
+    return;
+  }
 
   const payload = {
     full_name: name,
