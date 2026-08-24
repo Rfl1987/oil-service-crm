@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oil Service CRM</title>
-
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -14,18 +13,9 @@
   <div class="card login-card">
     <h1 class="login-title">Oil Service CRM</h1>
     <p class="small">İdarəetmə üçün daxil olun</p>
-
     <form onsubmit="login(event)">
-      <div class="field">
-        <label>E-poçt</label>
-        <input id="login_email" type="email" required />
-      </div>
-
-      <div class="field">
-        <label>Şifrə</label>
-        <input id="login_password" type="password" required />
-      </div>
-
+      <div class="field"><label>E-poçt</label><input id="login_email" type="email" required /></div>
+      <div class="field"><label>Şifrə</label><input id="login_password" type="password" required /></div>
       <button class="btn btn-blue btn-block" type="submit">Daxil ol</button>
     </form>
   </div>
@@ -47,14 +37,15 @@
   <button id="nav-dashboard" class="active" onclick="showView('dashboard')">Dashboard</button>
   <button id="nav-customers" onclick="showView('customers')">Müştərilər</button>
   <button id="nav-vehicles" onclick="showView('vehicles')">Avtomobillər</button>
+  <button id="nav-requests" onclick="showView('requests')">Müraciətlər</button>
   <button id="nav-order" onclick="showView('order')">Sifarişlər</button>
+  <button id="nav-finance" onclick="showView('finance')">Maliyyə</button>
 </nav>
 
 <main>
 
   <section id="view-dashboard" class="view">
     <div id="dashboard" class="stats"></div>
-
     <div class="card" style="margin-top:12px">
       <h2>Yaxınlaşan xatırlatmalar</h2>
       <div id="reminders"></div>
@@ -67,30 +58,16 @@
         <h2>Müştərilər</h2>
         <button class="btn btn-green" onclick="toggleCustomerForm()">+ Yeni müştəri</button>
       </div>
-
       <form id="customerForm" class="hidden" onsubmit="addCustomer(event)">
-        <div class="field">
-          <label>Ad Soyad *</label>
-          <input id="c_name" />
-        </div>
-        <div class="field">
-          <label>Telefon</label>
-          <input id="c_phone" placeholder="0501234567" />
-        </div>
-        <div class="field">
-          <label>WhatsApp</label>
-          <input id="c_whatsapp" placeholder="994501234567" />
-        </div>
-        <div class="field">
-          <label>Qeyd</label>
-          <input id="c_note" />
-        </div>
+        <div class="field"><label>Ad Soyad *</label><input id="c_name" /></div>
+        <div class="field"><label>Telefon * (0 ilə başlayan 10 rəqəm)</label><input id="c_phone" placeholder="0501234567" /></div>
+        <div class="field"><label>WhatsApp</label><input id="c_whatsapp" placeholder="994501234567" /></div>
+        <div class="field"><label>Qeyd</label><input id="c_note" /></div>
         <div class="row">
           <button type="submit" class="btn btn-blue">Yadda saxla</button>
           <button type="button" class="btn btn-gray" onclick="toggleCustomerForm()">Bağla</button>
         </div>
       </form>
-
       <div id="customers"></div>
     </div>
   </section>
@@ -101,39 +78,26 @@
         <h2>Avtomobillər</h2>
         <button class="btn btn-green" onclick="toggleVehicleForm()">+ Yeni avtomobil</button>
       </div>
-
       <form id="vehicleForm" class="hidden" onsubmit="addVehicle(event)">
-        <div class="field">
-          <label>Müştəri *</label>
-          <select id="v_customer"></select>
-        </div>
-        <div class="field">
-          <label>Marka *</label>
-          <input id="v_brand" placeholder="BMW" />
-        </div>
-        <div class="field">
-          <label>Model</label>
-          <input id="v_model" placeholder="F30" />
-        </div>
-        <div class="field">
-          <label>İl</label>
-          <input id="v_year" placeholder="2015" type="number" />
-        </div>
-        <div class="field">
-          <label>Dövlət nömrəsi</label>
-          <input id="v_plate" placeholder="10-XX-123" />
-        </div>
-        <div class="field">
-          <label>Son km</label>
-          <input id="v_mileage" placeholder="182400" type="number" />
-        </div>
+        <div class="field"><label>Müştəri *</label><select id="v_customer"></select></div>
+        <div class="field"><label>Marka *</label><input id="v_brand" placeholder="BMW" /></div>
+        <div class="field"><label>Model</label><input id="v_model" placeholder="F30" /></div>
+        <div class="field"><label>İl</label><input id="v_year" type="number" placeholder="2015" /></div>
+        <div class="field"><label>Dövlət nömrəsi</label><input id="v_plate" placeholder="10-XX-123" /></div>
+        <div class="field"><label>Son km</label><input id="v_mileage" type="number" placeholder="182400" /></div>
         <div class="row">
           <button type="submit" class="btn btn-blue">Yadda saxla</button>
           <button type="button" class="btn btn-gray" onclick="toggleVehicleForm()">Bağla</button>
         </div>
       </form>
-
       <div id="vehicles"></div>
+    </div>
+  </section>
+
+  <section id="view-requests" class="view hidden">
+    <div class="card">
+      <div class="card-head"><h2>Müraciətlər</h2></div>
+      <div id="requests"></div>
     </div>
   </section>
 
@@ -143,23 +107,10 @@
         <h2>Sifarişlər</h2>
         <button class="btn btn-green" onclick="toggleOrderForm()">+ Yeni yağ dəyişimi</button>
       </div>
-
       <form id="orderForm" class="hidden" onsubmit="addOrder(event)">
-        <div class="field">
-          <label>Müştəri *</label>
-          <select id="o_customer" onchange="loadOrderVehicles()"></select>
-        </div>
-
-        <div class="field">
-          <label>Avtomobil *</label>
-          <select id="o_vehicle" onchange="prefillMileage()"></select>
-        </div>
-
-        <div class="field">
-          <label>Son km *</label>
-          <input id="o_mileage" type="number" placeholder="182400" />
-        </div>
-
+        <div class="field"><label>Müştəri *</label><select id="o_customer" onchange="loadOrderVehicles()"></select></div>
+        <div class="field"><label>Avtomobil *</label><select id="o_vehicle" onchange="prefillMileage()"></select></div>
+        <div class="field"><label>Son km *</label><input id="o_mileage" type="number" placeholder="182400" /></div>
         <div class="field">
           <label>Paket</label>
           <select id="o_package">
@@ -168,28 +119,129 @@
             <option value="Full">Full</option>
           </select>
         </div>
-
-        <div class="field">
-          <label>Məbləğ (AZN)</label>
-          <input id="o_amount" type="number" placeholder="95" />
+        <div class="field"><label>Məbləğ (AZN)</label><input id="o_amount" type="number" placeholder="95" /></div>
+        <div class="grid2">
+          <div class="field"><label>Növbə tarix</label><input id="o_appt_date" type="date" /></div>
+          <div class="field"><label>Saat</label><input id="o_appt_time" placeholder="15:00" /></div>
         </div>
-
-        <div class="field">
-          <label>Qeyd</label>
-          <input id="o_note" />
-        </div>
-
+        <div class="field"><label>Qeyd</label><input id="o_note" /></div>
         <div class="row">
           <button type="submit" class="btn btn-blue">Sifariş yarat</button>
           <button type="button" class="btn btn-gray" onclick="toggleOrderForm()">Bağla</button>
         </div>
       </form>
-
       <div id="orders"></div>
     </div>
   </section>
 
+  <section id="view-finance" class="view hidden">
+    <div id="financeCards" class="stats-3"></div>
+    <div class="card" style="margin-top:12px">
+      <div class="card-head">
+        <h2 id="financeDetailTitle">Detal</h2>
+        <button class="btn btn-green" onclick="toggleExpenseForm()">+ Xərc əlavə et</button>
+      </div>
+      <form id="expenseForm" class="hidden" onsubmit="addExpense(event)">
+        <div class="field"><label>Ad *</label><input id="e_title" placeholder="Yağ alışı" /></div>
+        <div class="field">
+          <label>Kateqoriya</label>
+          <select id="e_category">
+            <option>Mal</option><option>İcarə</option><option>Əmək haqqı</option><option>Kommunal</option><option>Digər</option>
+          </select>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Məbləğ (AZN) *</label><input id="e_amount" type="number" placeholder="40" /></div>
+          <div class="field"><label>Tarix</label><input id="e_date" type="date" /></div>
+        </div>
+        <div class="field"><label>Qeyd</label><input id="e_note" /></div>
+        <div class="row">
+          <button type="submit" class="btn btn-blue">Yadda saxla</button>
+          <button type="button" class="btn btn-gray" onclick="toggleExpenseForm()">Bağla</button>
+        </div>
+      </form>
+      <h3 class="fin-h">Gəlir</h3>
+      <div id="financeIncome"></div>
+      <h3 class="fin-h">Xərc</h3>
+      <div id="financeExpense"></div>
+    </div>
+  </section>
+
 </main>
+
+<!-- Sifariş Modalı -->
+<div id="orderModal" class="modal hidden">
+  <div class="modal-overlay" onclick="closeOrderModal()"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="modalTitle">Sifariş</h3>
+      <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div id="modalSubtitle" class="small"></div>
+
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
+      <button class="btn btn-small" onclick="openCustomerDetail()">Ətraflı</button>
+      <button class="btn btn-small" onclick="toggleExtras()">+ Əlavə xidmətlər</button>
+    </div>
+
+    <div id="extrasPanel" class="extras hidden"></div>
+
+    <div class="field" style="margin-top:12px">
+      <label>Məbləğ (AZN)</label>
+      <input id="m_amount" type="number" />
+    </div>
+
+    <div class="field">
+      <label>Status</label>
+      <select id="m_status">
+        <option value="pending">Növbədə</option>
+        <option value="in_progress">İşdədir</option>
+        <option value="ready">Hazırdır</option>
+        <option value="done">Bağlandı</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Ödəniş</label>
+      <select id="m_payment" onchange="togglePaymentMethod()">
+        <option value="unpaid">Ödənilməyib</option>
+        <option value="paid">Ödənilib</option>
+      </select>
+    </div>
+
+    <div class="field" id="methodField" style="display:none">
+      <label>Ödəniş metodu</label>
+      <select id="m_method">
+        <option value="cash">Nağd</option>
+        <option value="card">Nağdsız (kart/köçürmə)</option>
+      </select>
+    </div>
+
+    <div id="m_appt_line" class="readonly-line hidden"></div>
+    <div id="m_customer_note" class="readonly-line hidden"></div>
+
+    <div class="field" style="margin-top:10px">
+      <label>Qeyd</label>
+      <input id="m_note" />
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn btn-green" onclick="modalWhatsApp()">WhatsApp</button>
+      <button class="btn btn-blue" onclick="saveOrderModal()">Yadda saxla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ətraflı (Müştəri Tarixçəsi) Modalı -->
+<div id="detailModal" class="modal hidden">
+  <div class="modal-overlay" onclick="closeDetailModal()"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="detailTitle">Müştəri</h3>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div id="detailContent"></div>
+  </div>
+</div>
 
 </div>
 
