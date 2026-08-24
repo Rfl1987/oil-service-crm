@@ -87,6 +87,12 @@ function fmtDate(d) {
   const dd = String(d.getDate()).padStart(2, "0");
   return y + "-" + m + "-" + dd;
 }
+function fmtDateAZ(isoDate) {
+  if (!isoDate) return "";
+  const p = isoDate.split("-");
+  if (p.length !== 3) return isoDate;
+  return p[2] + "." + p[1] + "." + p[0];
+}
 function getPeriodStart(period) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -377,9 +383,29 @@ function requestWhatsApp(id) {
   if (!r) return;
   const clean = (r.whatsapp_phone || r.phone || "").replace(/\D/g, "");
   if (!clean) { alert("WhatsApp nömrəsi yoxdur"); return; }
-  const text = "Salam " + r.full_name + ", Oil Service Mərkəzindən narahat edirik. " + (r.brand || "") + " " + (r.model || "") + " avtomobiliniz üçün müraciətiniz qəbul edildi. Sizə uyğun vaxtı təsdiqləmək üçün cavab yazın.";
+
+  const vehicle = (r.brand || "") + " " + (r.model || "");
+
+  let timeText = "";
+  if (r.preferred_date) {
+    timeText = fmtDateAZ(r.preferred_date);
+    if (r.preferred_time) timeText += " " + r.preferred_time;
+  }
+
+  let text;
+  if (timeText) {
+    text = "Salam " + r.full_name + ", Oil Service Mərkəzindən narahat edirik. " +
+      vehicle + " avtomobiliniz üçün müraciətiniz qəbul edildi. " +
+      "Zəhmət olmasa növbə götürdüyünüz vaxtı (" + timeText + ") təsdiqləmək üçün cavab yazın.";
+  } else {
+    text = "Salam " + r.full_name + ", Oil Service Mərkəzindən narahat edirik. " +
+      vehicle + " avtomobiliniz üçün müraciətiniz qəbul edildi. " +
+      "Sizə uyğun vaxtı təsdiqləmək üçün cavab yazın.";
+  }
+
   window.open("https://wa.me/" + clean + "?text=" + encodeURIComponent(text), "_blank");
 }
+
 async function deleteRequest(id) {
   if (!confirm("Müraciət silinsin?")) return;
   const { error } = await db.from("service_requests").delete().eq("id", id);
